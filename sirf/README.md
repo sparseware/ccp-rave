@@ -1,0 +1,3 @@
+SIRF is a Simple Ruby Framework geared towards building RESTful applications. SIRF leaves most of the architectural decisions up to the developer. Its purpose is to provide a minimal framework necessary to get started. It provides basic session management, static and dynamic file serving (using Erubis) and module management. The module manager maps urls to Ruby module/class combinations and loads the appropriate class to handle the url. SIRF leverages Ruby Rack (http://rack.rubyforge.org) to support Web server plug-n-play.
+
+It is a zero-downtime frame work. It provides for module file monitoring and automatic recompilation and reload when a monitored file is changed.

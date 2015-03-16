@@ -1,0 +1,118 @@
+#=============================================================================
+#  Copyright (c) SparseWare. All rights reserved.
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU Affero General Public License as
+#  published by the Free Software Foundation, either version 3 of the
+#  License, or (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU Affero General Public License for more details.
+#
+#  You should have received a copy of the GNU Affero General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#=============================================================================
+
+#=============================================================================
+# Configuration of the SIRF framework
+#=============================================================================
+
+# the root dirictory
+local_directory:  .
+
+# the URL prefix for the application
+prefix: /hub/
+
+# the amount of time in seconds before a session times out
+http_session_timeout: 43200
+
+# the amount of time in seconds before an application session object times out (should no be greater that the http_session_timeout)
+app_session_timeout: 1800
+
+#force the server to use a special http auth string so browser based clients wont have the browser trying to handle authentication
+use_special_auth: false
+
+#specify what status code to send to request the client authentication (defaults to 401)
+#http_aut_status_code: 401
+
+
+#the address of the memcache server
+#memcache_server:
+
+  
+# The prefix for modules. Thiks is the directory
+# that will be search for files corresponding to URL paths
+# It can be an empty string to process all directoies not
+# identified as file directories
+module_directory: vista
+
+# The name of the root ruby module that classes will belong to
+ruby_module_name: Vista
+
+# whether modules files should be cached or classes recreated on every access
+cache_modules: true
+
+# whether modules files should be monitored for changes
+monitor_files: true
+
+#the frequency in seconds to monitor module files for changes (use a small number for dev and a large number for production)
+file_monitor_frequency: 5
+
+
+#file to use to create the offset id to use for offsetting id's stored
+#in a session
+#offset_id_file: offset_id.txt
+
+#diretories subordinate to module directories
+#that should be treated as file directores (i.e not containing any sub-modules)
+module_file_directories:
+  - media
+  - scripts
+  - ui
+  - data
+ 
+# extentions for files to process for embedded ruby
+erubis_types: {
+  .erml: "text/x-rml",
+}
+
+additional_mime_types: {
+  .rml: "text/x-rml",
+  .erml: "text/x-rml",
+  .csv_fm: "text/plain;separator=^",
+  .csv_fm_ld: "text/plain;separator=^;ldseparator=|",
+  .csv_fm_ri: "text/plain;separator=^;riseparator=~",
+  .csv_fm_ld_ri: "text/plain;separator=^;ldseparator=|;riseparator=~"
+}
+
+#=============================================================================
+#Vista specific configuration that is global to all instances
+#=============================================================================
+
+facility_id: 0
+
+
+rpc_lists: {
+  "exam_type_list": "ORWPCE GET EXAM TYPE",
+  "hf_type_list": "ORWPCE GET HEALTH FACTORS TY",
+  "skin_test_type_list": "ORWPCE GET SKIN TEST TYPE",
+  "skin_test_result_list": "ORWPCE GET HEALTH FACTORS TY",
+  "education_type_list": "ORWPCE GET EDUCATION TOPICS",
+  "hist_locations_st": "ORQQPX GET HIST LOCATIONS",
+  "default_locations_st": "ORQQPX GET DEF LOCATIONS"
+}
+
+field_mappings: {
+  patient: {
+    alerts: {
+      fields:
+        -"description"
+        -"due_date"
+        -"last_occurance"
+        -"priority"
+        -"type"
+    }
+  } 
+}

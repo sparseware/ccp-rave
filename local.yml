@@ -1,0 +1,141 @@
+#=============================================================================
+#  Copyright (c) SparseWare. All rights reserved.
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU Affero General Public License as
+#  published by the Free Software Foundation, either version 3 of the
+#  License, or (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU Affero General Public License for more details.
+#
+#  You should have received a copy of the GNU Affero General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#=============================================================================
+
+#=============================================================================
+# Configuration of the RAVE framework for a specific Vista host
+#=============================================================================
+
+#the vista host
+host: localhost
+
+#the rpc broker port
+port: 9201
+
+#whether connections should be pooled
+pooled: false
+
+#the default division for login purposes
+defdiv: DIV
+
+#if the broker should auto reconnect users if they were disconnected
+auto_reconnect: true
+
+#if we should support basic authentication
+support_basic_auth: true
+
+#enables debug logging
+debug: true
+
+#check for idle connections every 5 minutes (connections that the broker has timed out) when connection pooling
+idle_check: 300
+
+# the amount of time in seconds before the client should time out
+client_timeout: 900
+
+order_category_piece: 3
+
+#mapping of order types to standardized named types
+order_type_mapping: {
+"3" : "meds",
+"4" : "meds",
+"5" : "labs",
+"6" : "labs",
+"7" : "labs",
+"8" : "labs",
+"9" : "imaging",
+"10" : "diet",
+"11" : "consults",
+"12" : "vitals",
+"13" : "nursing",
+"14" : "activity",
+"15" : "surgery",
+"17" : "adt",
+"18" : "other",
+"21" : "meds",
+"22" : "infusion",
+"23" : "labs",
+"24" : "labs",
+"25" : "labs",
+"26" : "labs",
+"27" : "labs",
+"28" : "labs",
+"29" : "imaging",
+"30" : "imaging",
+"31" : "imaging",
+"32" : "imaging",
+"33" : "imaging",
+"34" : "imaging",
+"35" : "imaging",
+"36" : "imaging",
+"37" : "imaging",
+"38" : "diet",
+"39" : "diet",
+"40" : "diet",
+"41" : "diet",
+"42" : "procedures",
+"43" : "allergy",
+"44" : "adt",
+"45" : "adt",
+"46" : "diet",
+"48" : "home_meds",
+"49" : "diet",
+"61" : "ivs",
+"62" : "clinic_orders",
+}
+
+#Mapping of order category text name to a new name
+order_category_mapping: {
+"Home Med" : "Medications",
+"Lab" : "Labs",
+"Inpt. Meds" : "Medications",
+"Infusion" : "IV Solutions"
+}
+
+#Mapping of order category text name to a new name
+lab_category_mapping: {
+"MI" : "Microbiology",
+"CH" : "Chemistry",
+"HE" : "Hemotology",
+"AP" : "Anatomic Pathology"
+}
+
+#Mapping of document class to text name
+document_class_mapping: {
+  "3" : "Clinical Notes",
+  "244" : "Discharge Summaries",
+
+}
+
+#how much time to wait for the broker read and process the good-bye message
+linger: 0
+
+
+# whether time should be calculated locally or based on the time of the vista server
+calculate_time_locally: true
+
+#parameters to send to the client when a user logs on
+client_site_parameters: {
+  xmpp_server: "",
+  xmpp_service: "",
+  xmpp_muc_service: "",
+  keepalive_interval: 120,
+  attributesURL: "vista/ui/attributes.json"
+}
+
+#Application strings the get_String methods on intModuleBase class will look for strings here
+application_strings: {
+}
