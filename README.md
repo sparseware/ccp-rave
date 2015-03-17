@@ -83,7 +83,13 @@ and you could get their labs in JSON format using:
 For general discussions regarding the platform please join the [Clinical Client Platform (CCP) discussion group](http://groups.google.com/d/forum/clinical-client-platform)
 
 ## License
-RaVe is available under the GNU Affero General Public License See the LICENSE file for more info.
+RaVe is available under the GNU Affero General Public License See the [LICENSE](LICENSE) file for more info.
 
 ##Acknowledgements
+
+A thank you to **Steve Shreeve** for:
+
+* Writing the original RPC broker client
+* Inspiring me to use Ruby and to write the SIRF frame work
+
 
