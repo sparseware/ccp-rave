@@ -208,6 +208,13 @@ module Rave
       return @is_physician
     end
     
+   #=============================================================================
+    # Returns whether the session has an attached broker
+    #=============================================================================
+    def has_broker?
+      return @broker!=nil
+    end
+    
     #=============================================================================
     # Sets whether the current is a physician
     #=============================================================================
@@ -536,7 +543,7 @@ module Rave
           if a[0]=="[Misc]"
             a=a[1].split(/\n/,3)
             more_start=a[0].split(/\^/)[1]
-            #            puts more_start
+            #puts more_start
             a[1]=a[2]
             more=true
             a[2]=nil
@@ -615,7 +622,15 @@ module Rave
     # this module
     #=============================================================================
     def check_auth(session,conn,paths)
+      #check if we are using a pin to piggyback on another session
+      pin_session=session['pin_session']
+      if(pin_session && pin_session.has_baroker?) 
+        session=pin_session
+      else
+        session['pin_session']=nil
+      end
       session.loggedin_broker(conn)
+      return session
     end
     
     #=============================================================================

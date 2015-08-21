@@ -21,8 +21,8 @@ module Vista
   module Util
     class Patients < RestrictedModule
       def initialize
-        @lookup_fields='@;.01;.03I;.02I;21400.99;.104IE;.102;21405.1;.1;.108'.freeze
-        @select_lookup_fields='@;.01;.03I;.02I;21400.99;.104IE;.102;21405.1;.1IE;.108;.1041IE'.freeze
+               @lookup_fields='@;.01;.03I;.02I;.09;.104IE;.102;.1;.108'.freeze
+        @select_lookup_fields='@;.01;.03I;.02I;.09;.104IE;.102;.1IE;.108;.1041IE'.freeze
         @gender={
           "M" => "Male",
           "F" => "Female",
@@ -311,6 +311,16 @@ module Vista
       end
 
       def format_row(format,row,for_list=true,su=StringUtils.new)
+        #IEN=0
+        #NAME=1 #.01
+        #DOB=2 #.03
+        #SEX=3 #.02
+        #SSN=4 #.109
+        #PROVIDER=5 #.104-IEN
+        #PROVIDER=6 #.104-NAME
+        #CURRENT_MOVEMENT=7 #.102
+        #WARD_LOCATION=8 #.1
+        #CURRENT_ROOM=9 #.108
         list=row.split('^')
         for i in 0..10
           list[i]='' unless list[i]
@@ -320,36 +330,31 @@ module Vista
         g=@gender[list[3]]
         list[3]=g if g
         unless for_list
+          list.insert(8, '') #insert encounter reason 
           case format
           when 'json'
             list[1].escape_string!
-            list[5].escape_string!
+            #list[7].escape_string!
           else
             list[1].escape_string_quote_if_necessary!
-            list[5].escape_string_quote_if_necessary!
+            #list[7].escape_string_quote_if_necessary!
           end
           return list
         end
-        list[8]=su.title_case(list[8])
-        list[5] << "|" << list[6]
-        
+        list[5] << "|" << list[6] if list[6]!=""
         list[6]=list[7]
-        list[7]=list[8]
-        list[8]=list[9]
-        list[9]=list[10]
+        list[7]="" #encounter reason
         list[10]='' #photo
         list.pop(list.length-10)
         case format
         when 'json'
           list[1].escape_string!
-          list[5].escape_string!
+          list[6].escape_string!
           list[7].escape_string!
-          list[8].escape_string!
         else
           list[1].escape_string_quote_if_necessary!
-          list[5].escape_string_quote_if_necessary!
+          list[6].escape_string_quote_if_necessary!
           list[7].escape_string_quote_if_necessary!
-          list[8].escape_string_quote_if_necessary!
         end
         return list
       end
