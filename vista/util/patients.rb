@@ -388,18 +388,18 @@ module Vista
           l0=a[0].length()
           l1=a[1].length()
           query=a[0]
-          screen="i $e(^(0),1,#{l0})=\"#{a[0]}\",$e($p(^(0),\",\",2),1,#{l1})=\"#{a[1]}\""
+          screen="I $E(^(0),1,#{l0})=\"#{a[0]}\",$E($P(^(0),\",\",2),1,#{l1})=\"#{a[1]}\""
         elsif query.index(' ')
           a=query.split(/ /,2)
           l0=a[1].length()
           l1=a[0].length()
           query=a[1]
-          screen="i $e(^(0),1,#{l0})=\"#{a[1]}\",$e($p(^(0),\",\",2),1,#{l1})=\"#{a[0]}\""
+          screen="I $E(^(0),1,#{l0})=\"#{a[1]}\",$E($P(^(0),\",\",2),1,#{l1})=\"#{a[0]}\""
         end
         if screen
-          screen << ",$p(^(0),U,2)=\"#{gender}\"" if gender 
+          screen << ",$P(^(0),U,2)=\"#{gender}\"" if gender 
         else
-          screen="i $p(^(0),U,2)=\"#{gender}\"" if gender 
+          screen="I $P(^(0),U,2)=\"#{gender}\"" if gender 
         end
         params={
           FM::FILE => '2',
@@ -408,6 +408,7 @@ module Vista
           FM::MAX => max,
           FM::PART =>query
         }
+        puts screen if screen
         params[FM::FROM]=start if start
         params[FM::FLAGS]='B' if dir=="-1"
         params[FM::SCREEN]=screen if screen

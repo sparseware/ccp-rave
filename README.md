@@ -9,7 +9,7 @@ For example, making the REST call */hub/main/patient/allergies* will invoke the 
 
 To add a new path, simply add a new ruby file in the directory (or a sub-directory), no other configuration is required.
 
-**Note:** The VA VistA plugin was developed against a VistA database from Circa 2010 which has not been updated with the latest software/patches.
+**Note:** The VA VistA plugin was developed against a OpenVistA database from Circa 2010 and has not been updated with the latest software/patches.
 
 
 ##Requirements
@@ -17,6 +17,9 @@ JRuby 1.7+
 
 
 ##Getting Started
+
+**Before you get started ensure that the VistA RPC broker is running and functional. Ensure that you can connect to the Server with the standard CPRS client.**
+
 The best way to run this service is to install [TorqueBox](http://torquebox.org). TorqueBox is a JBoss based application server configured for running JRuby applications. It is not necessary to actually run the TorqueBox server, just having it installed gets you most of what you need. 
 
 The first thing that is needed is to configure the service to connect to the VA Vista RPC broker. Modify the *local.yml* file and change the *host* and *port* fields to match the location of the RPC broker and the *defdiv* field to match the default Vista division to use to login. 
@@ -76,7 +79,13 @@ and you could get their labs in JSON format using:
 `curl -c cookies.txt -b cookies.txt localhost:8082/hub/main/labs/list.json -u access:verify`
 
 
-**Note:** In production, basic authentication support should be disabled.
+**Note:** In production, basic authentication support should be disabled and SSL should be used when acing the service vian any external network.
+
+##Configuring the [BellaVista client](https://github.com/sparseware/ccp-bellavista)
+To access the service via the BellVista Client:
+* Log into the client using the "Local Demo" account* Tap the "Settings" button on the action bar at the top* Tap the "Manage Servers" option in the settings popup* Tap the plus (+) icon in the "Manage Servers" option (a  "&lt;new server&gt;" entry will be added to the list)* Enter a name for the server in the **Name** field (this is the name that will appear in the login dialog)* Enter the URL for the server in the **URL** field. This is the part of the URL that comes before "/hub/main". Assuming you are running the service from the command line (as described above) on port 8082 on a machine called "vista.yourcompany.com" you would enter http://vista.yourcompany.com:8082(use https when connecting to a secure server).
+* Restart the client and choose the server from the server drop-down list.
+
 
 
 ##Discussions

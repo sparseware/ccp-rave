@@ -148,8 +148,8 @@ module Vista
     #   $P(9)   PARENT DATA FILE image pointer
     #   $P(10)   the ABSTYPE :  'M' magnetic 'W' worm  'O' offline
     #   $P(11)   Image accessibility   'A' accessable  or  'O' offline
-    #   $p(12^13) Dicom Series number and Dicom Image Number
-    #   $p(14)   Count of images in the group, or 1 if a single image
+    #   $P(12^13) Dicom Series number and Dicom Image Number
+    #   $P(14)   Count of images in the group, or 1 if a single image
     #
     #   Note: the actuals broker response has an additional first element to the piece numbers above are offset by +1
     #

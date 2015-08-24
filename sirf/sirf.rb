@@ -269,6 +269,16 @@ module Sirf
     end
     
     # =============================================================================
+    #  Finds a session containing a specific value
+    #  
+    #  @param key the key
+    #  @param value the value
+    # =============================================================================
+    def find_session_with_value(key,value)
+      return @session_manager.find_session_with_value(key,value)
+    end
+    
+    # =============================================================================
     # Sets the session object into the specified Rack environment object
     # =============================================================================
     def set_session(env)
@@ -514,6 +524,13 @@ module Sirf
     def dispose
          
     end
+    #=============================================================================
+    # Get the id of the session.
+    # This is the id that the session manager uses to track sessions
+    #=============================================================================
+    def get_id
+      return object_id
+    end
   end
 
   # =============================================================================
@@ -529,7 +546,7 @@ module Sirf
       begin
         conn=create_connection(app,env,paths)
         sess=env[SESSION]
-        check_auth(sess,conn,paths)
+        sess=check_auth(sess,conn,paths)
         process(sess,conn,paths)
         return conn.full_response if conn.full_response
         conn.finish_body()
@@ -586,6 +603,7 @@ module Sirf
     # This version does nothing
     # =============================================================================
     def check_auth(session,conn,paths)
+      return session
     end
     
     # =============================================================================
@@ -1168,8 +1186,7 @@ module Sirf
     # =============================================================================
     def initialize(auto_purge=true,persist=true)
       @auto_purge=auto_purge
-      @sessions={}
-      @mutex=Mutex.new
+      @sessions=java.util.concurrent.ConcurrentHashMap.new
       @purge_timeout=60*30 #30 minutes
       @last_purge=Time.now
       @persist=persist
@@ -1190,9 +1207,7 @@ module Sirf
     # =============================================================================
     def remove_session(session)
       return if !session
-      @mutex.synchronize do
-        @sessions.delete(session.object_id)
-      end
+      @sessions.delete(session.object_id)
     end
     
     # =============================================================================
@@ -1208,33 +1223,56 @@ module Sirf
       id=http_session[@session_id_string]
       marker=http_session[@session_marker_string]
       session=nil
-      @mutex.synchronize do
-        session=@sessions[id] if id
-        if session && session_timeout?(session,@session_timeout)==true
-          session=nil
-          @sessions.delete(id)
-        end
-        if !session || session.marker!=marker
-          session=create_session()
-          id=session.object_id
-          marker=session.marker
-          @sessions[id]=session
-          puts "Created new session:"+id.to_s if Sirf::verbose
-        else
-          puts "Found session:"+id.to_s if Sirf::verbose
-        end
-        now=session.timestamp()
-        if (@auto_purge && @last_purge+@purge_timeout)<now
-          @last_purge=now
-          purge_ex()
-        end
-
+      session=@sessions[id] if id
+      if session && session_timeout?(session,@session_timeout)==true
+        session=nil
+        @sessions.delete(id)
+      end
+      if !session || session.marker!=marker
+        session=create_session()
+        id=session.object_id
+        marker=session.marker
+        @sessions[id]=session
+        puts "Created new session:"+id.to_s if Sirf::verbose
+      else
+        puts "Found session:"+id.to_s if Sirf::verbose
+      end
+      now=session.timestamp()
+      if (@auto_purge && @last_purge+@purge_timeout)<now
+        @last_purge=now
+        purge()
       end
       http_session[@session_marker_string]=marker
       http_session[@session_id_string]=id
       return session
     end
     
+    # =============================================================================
+    #  Gets the session corresponding the the session id.
+    #  
+    #  @param id the session_id
+    # =============================================================================
+    def get_session_ex(id)
+      return nil unless @persist
+      return @sessions[id]
+    end
+
+    # =============================================================================
+    #  Finds a session containing a specific value
+    #  
+    #  @param key the key
+    #  @param value the value
+    # =============================================================================
+    def find_session_with_value(key,value)
+      return nil unless @persist
+      @sessions.each_value  do |sess|
+        if sess[key]==value
+          return sess
+        end
+      end
+      return nil
+    end
+
     # =============================================================================
     # Returns whether or not the session timed out
     # =============================================================================
@@ -1246,12 +1284,6 @@ module Sirf
     # Removes all stale sessions from the session cache
     # =============================================================================
     def purge()
-      @mutex.synchronize do
-        purge_ex()
-      end
-    end
-    private
-    def purge_ex()
       begin
         sessions=@sessions.dup
         tout=Time.now-@purge_timeout

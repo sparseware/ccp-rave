@@ -459,7 +459,7 @@ module Rave
       end
       a=res.split(/\n/,2)
       a[0].strip!
-      query_error(123) if a[0]=="[Errors]"
+      query_error("123") if a[0]=="[Errors]"
       query_error(a[1]) if a[0]=="[BEGIN_diERRORS]"
       if rpc=='DDR FINDER'
         if a[0]=="[BEGIN_diDATA]"
@@ -525,7 +525,7 @@ module Rave
       if res
         a=res.split(/\n/,2)
         a[0].strip!
-        query_error(123) if a[0]=="[Errors]"
+        query_error("123") if a[0]=="[Errors]"
         query_error(a[1]) if a[0]=="[BEGIN_diERRORS]"
         if rpc=='DDR FINDER'
           if a[0]=="[BEGIN_diDATA]"
