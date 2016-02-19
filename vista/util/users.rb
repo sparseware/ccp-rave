@@ -37,9 +37,9 @@ module Vista
         }
         @user_lookup_fields='@;.01'.freeze
         @user_lookup_field_names='primary_key^name'.freeze
-        #.132=ophone;.133=mobile;..136=fax;111=street;.112;.113;.114=city;.115;.116=zip;.151=email;5=sex;5=dob;'.freeze
+        #.132=ophone;.133=mobile;..136=fax;111=street;.112;.113;.114=city;.115;.116=zip;.151=email;5=sex;5=dob
         @info_fields='@;.01;5;4I;.151;.132;.133;.136;.111;.112;.113;.114;.115;.116'
-        @info_fields_out   ="id^name^dob^gender^speciality^email^office_number^mobile_number^fax_number^street^city^state_or_province^zip_code^country^photo"
+        @info_fields_out   ="id^xmpp_id^name^dob^gender^speciality^is_provider^email^office_number^mobile_number^fax_number^street^city^state_or_province^zip_code^country^photo"
       end
 
       # =============================================================================

@@ -236,7 +236,7 @@ module Vista
       info=create_result_info(accession,specimen,requestor,comment)
       info_name=get_string('clinical.labs.collection_info','Collection Info')
       #for the header he comment is part of the JSON d and we set comment to "true" if there is a comment
-      ClinicalUtils.create_labs_value_row(header,format,ldate,nil,nil,"__CI__",info_name,info,nil,nil,nil,"true",nil,nil,nil,comment=="" ? " false" : "true")
+      ClinicalUtils.create_labs_value_row(header,format,ldate,nil,nil,"__CI__",info_name,info,nil,nil,nil,"true",nil,nil,nil,comment=="" ? "false" : "true")
       n=0
       out=[]
       categoryName=@lab_categories[category]

@@ -1,5 +1,7 @@
 #RaVe
-RaVe (Ruby and Vista Environment) is an implementation of a web service designed to service clients built on the [Clinical Client Platform](https://github.com/sparseware/ccp-bellavista). It leverages a Ruby web framework, built on top of [Rack](http://rack.github.io), called SIRF. SIRF is included with this project.
+RaVe (Ruby and Vista Environment) is an implementation of a web service designed to service clients built on the [Clinical Client Platform](https://github.com/sparseware/ccp-bellavista). It leverages a Ruby web framework, built on top of [Rack](http://rack.github.io), called SIRF. SIRF is included with this project. 
+
+Please the [BellaVista client wiki](https://github.com/sparseware/ccp-bellavista/wiki/Data-Model) for the data model that this service supports.
 
 The environment is configured to service */hub/main/* as its REST prefix, which maps to the *vista* sub-directory in this repository. Unless otherwise specified in the *config.yml* file, this directory and subdirectories contain ruby files that map to a piece of the path in a URL. The ruby file in-turn contains a Ruby class with methods that map to another piece of the path in the URL.
 
@@ -83,7 +85,7 @@ and you could get their labs in JSON format using:
 
 ##Configuring the [BellaVista client](https://github.com/sparseware/ccp-bellavista)
 To access the service via the BellVista Client:
-* Log into the client using the "Local Demo" account* Tap the "Settings" button on the action bar at the top* Tap the "Manage Servers" option in the settings popup* Tap the plus (+) icon in the "Manage Servers" option (a  "&lt;new server&gt;" entry will be added to the list)* Enter a name for the server in the **Name** field (this is the name that will appear in the login dialog)* Enter the URL for the server in the **URL** field. This is the part of the URL that comes before "/hub/main". Assuming you are running the service from the command line (as described above) on port 8082 on a machine called "vista.yourcompany.com" you would enter http://vista.yourcompany.com:8082(use https when connecting to a secure server).
+* Log into the client using the "Local Demo" account* Tap the "Settings" button on the action bar at the top* Tap the "Manage Servers" option in the settings popup* Tap the plus (+) icon in the "Manage Servers" option (a  "&lt;new server&gt;" entry will be added to the list)* Enter a name for the server in the **Name** field (this is the name that will appear in the login dialog)* Enter the URL for the server in the **URL** field. This is the part of the URL that comes before "/hub/main". Assuming you are running the service from the command line (as described above) on port 8082 on a machine called "vista.yourcompany.com" you would enter **http://vista.yourcompany.com:8082** (use https when connecting to a secure server).
 * Restart the client and choose the server from the server drop-down list.
 
 

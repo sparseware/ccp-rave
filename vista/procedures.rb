@@ -16,7 +16,7 @@
 #=============================================================================
 include Rave
 module Vista
-  class Consults < ClinicalModule
+  class Procedures < ClinicalModule
 
     def initialize
       @service_types={
@@ -45,19 +45,19 @@ module Vista
 
     
     #=============================================================================
-    # Gets a consult
+    # Gets a procedure
     # 
-    # @note path=consult/{id}
+    # @note path=procedure/{id}
     # 
-    # @nore we send the text of the consult
+    # @nore we send the text of the procedure
     #=============================================================================
-    def consult(session,conn,broker,dfn,paths)
+    def procedure(session,conn,broker,dfn,paths)
       ien,format=extract_format_and_key(conn,paths)
       send_text(conn,format,broker.rpc("ORQQCN DETAIL", ien))
     end
 
     #=============================================================================
-    # Gets a document that was attached to a consult.
+    # Gets a document that was attached to a procedure.
     # This is the same as calling documents/document/{id}
     # 
     # @note path=document/{id}
@@ -71,7 +71,7 @@ module Vista
 
   
     #=============================================================================
-    # Gets a list of consults
+    # Gets a list of procedures
     #
     # @note path=list
     # 
@@ -118,7 +118,7 @@ module Vista
         list[4]=""
         list[5]=""
         array << list
-        process_consult(mod,array,conn,broker,ien)
+        process_procedure(mod,array,conn,broker,ien)
       end
       state=start_line_data(conn,format,@fields,@fields_linked_data)
       array.each do |row|
@@ -135,11 +135,11 @@ module Vista
     
     
     ##
-    # Processes a consult looking for child documents
+    # Processes a procedure report looking for child documents
     # 
-    # @param [String] id the id of the consult
+    # @param [String] id the id of the procedure
     ##
-    def process_consult(mod,outArray,conn,broker,ien)
+    def process_procedure(mod,outArray,conn,broker,ien)
       rpc = broker.rpc("ORQQCN GET CONSULT", ien)
       #Broker documented return
       #     1    2    3     4     5     6    7    8   9    10   11  12   13     14    15

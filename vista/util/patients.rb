@@ -22,7 +22,7 @@ module Vista
     class Patients < RestrictedModule
       def initialize
                @lookup_fields='@;.01;.03I;.02I;.09;.104IE;.102;.1;.108'.freeze
-        @select_lookup_fields='@;.01;.03I;.02I;.09;.104IE;.102;.1IE;.108;.1041IE'.freeze
+        @select_lookup_fields='@;.01;.03I;.02I;.09;.104IE;.102;.1;.108;.1041IE'.freeze
         @gender={
           "M" => "Male",
           "F" => "Female",
@@ -32,10 +32,14 @@ module Vista
         @list_fields   ="id^name^dob^gender^mrn^provider_name^encounter_date^encounter_reason^location^rm_bed^photo".split('^')
         @list_fields_linked_data=Array.new(10)
         @list_fields_linked_data[5]=true
+        @list_fields_linked_data[8]=true
         @most_recent_map=Caching::CachedConcurrentMap.new  #put in database when in production
-        @select_fields ="id^name^dob^gender^mrn^provider_id^provider_name^encounter_date^encounter_reason^location_id^location^rm_bed^attending_id^attending_name^language^photo^relationship^code_status^code_status_short^wt^ht^io_in^io_out".split('^')
+        @select_fields ="id^name^dob^gender^mrn^provider^encounter_date^encounter_reason^location^rm_bed^photo^attending^language^relationship^code_status^code_status_short^wt^ht^io_in^io_out".split('^')
         @select_fields_linked_data=Array.new(@select_fields.length)
-        @select_fields_linked_data[16]=true # linked data
+        @select_fields_linked_data[5]=true
+        @select_fields_linked_data[8]=true
+        @select_fields_linked_data[11]=true 
+        @select_fields_linked_data[13]=true 
       end
       # =============================================================================
       # =============================================================================
@@ -117,13 +121,9 @@ module Vista
         session.patient_selected(conn,dfn,list[4],vc,list[9].dup)
         slist=select_helper(conn,format,broker, dfn)
         #return field positions
-        #0=id,1=name,2=dob,3=gender,4=mrn,5=provider_id,6=provider_name,7=encounter_date,8=encounter_reason
-        #9=location_id,10=location,11=rm_bed,12=attending_id,13=attending_name,14=language,15=photo
-        #16=relationship,17=code_status,18=code_status_short,19=wt,20=ht,21=io_in,22=io_out
-        slist[9]=list[4] #location id
-        slist[8]=su.title_case(slist[8])
-        slist[16]="1|Caregiver" # hard-code relationship
-        slist[22]="" # force the list to expand
+        #0=id,1=name,2=dob,3=gender,4=mrn,5=provider,7=encounter_date,7=encounter_reason
+        #8=location,9=rm_bed,10=photo,11=attending,12=language
+        #13=relationship,17=code_status,18=code_status_short,19=wt,20=ht,21=io_in,22=io_out
         
         team=Array.new
         m=slist[5]
@@ -131,16 +131,27 @@ module Vista
           slist[6]=su.title_case(slist[6])
           s="#{m}^^#{slist[6]}^Admitting Physician^true^"
           team << s
+          slist[5] << "|" << slist[6]
         end
-        m=slist[14]
-        if m && m.to_i>0
-          slist[15]=su.title_case(slist[15])
-          s="#{m}^^#{slist[15]}^Attending Physician^true^"
+        slist.delete_at(6)
+        slist[6]=slist[7] #encounter date
+        slist[7]="" #encounter reason
+        slist[8]=su.title_case(slist[8]) #location
+        slist[8]=list[4] + "|" + slist[8]
+        if slist[11]!="" #attending
+          s="#{slist[10]}^^#{slist[11]}^Attending Physician^true^"
           team << s
+          slist[11]=su.title_case(slist[11])
+          slist[10] << "|" << slist[11] 
+          slist[11]=slist[10] #attending 
         end
+        slist[10]="" #photo
+        slist[13]="1|Caregiver" # hard-code relationship
+        slist[19]="" # force the list to expand
+
         session["select_care_team"]=team if team.length>0
         session["sensitive_patient"]=list[8]=="1" ? true : false
-        vitals(broker, dfn,slist,19)
+        vitals(broker, dfn,slist,16)
         conn.mime_json
         conn.puts "{"
         i=0
@@ -319,7 +330,7 @@ module Vista
         #PROVIDER=5 #.104-IEN
         #PROVIDER=6 #.104-NAME
         #CURRENT_MOVEMENT=7 #.102
-        #WARD_LOCATION=8 #.1
+        #WARD_LOCATION=8 
         #CURRENT_ROOM=9 #.108
         list=row.split('^')
         for i in 0..10

@@ -39,15 +39,15 @@ module Vista
       @osat_fields="date^order^instructions".split(/\^/)
       @allergy_fields="allergen^reaction".split(/\^/)
       @allergy_fields_linked_data=[true,nil]
-      @problem_fields="problem^date^confirmation_status".split(/\^/)
+      @problem_fields="problem^status".split(/\^/)
       @problem_fields_linked_data=[true,nil,nil]
       @careteam_fields="id^xmpp_alias^name^role^is_physician".split(/\^/)
       @admissions_fields="date^location^admit_type^discharge_status"
       @admissions_fields_linked_data=[nil,true,nil,true]
       @appointments_fields="date^location^status"
       @appointments_fields_linked_data=[true,nil,nil]
-      @description_fields=["description"]
-      @description_fields_linked_data=[true]
+      @flag_fields=["description"]
+      @flag_fields_linked_data=[true]
     end
     
     def summary(session,conn,broker,dfn,paths)
@@ -127,7 +127,7 @@ module Vista
       res = broker.rpc("ORPRF HASFLG",dfn)
       res.strip!
       return no_data(conn,format) if res==""
-      state=start_line_data(conn,format,@description_fields,@description_fields_linked_data)
+      state=start_line_data(conn,format,@flag_fields,@flag_fields_linked_data)
       state.escape=true
       res.each_line do |line|
         line.replace_char!('^','|')

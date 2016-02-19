@@ -128,5 +128,5 @@ end
 def run_rave
   rack_options={}
   app=create_rave_app(true,rack_options)
-	Rack::Handler::Mongrel.run(app,rack_options)
+	Rack::Handler::WEBrick.run(app,rack_options)
 end

@@ -21,11 +21,6 @@ module Vista
     def initialize
       @order_types=nil
       @order_category_mapping=nil
-      @med_fields="type^drug^infusion_rate^start_date^stop_date^refills^tot_dose^unit_per_dose^orderid^status^lastfill^directions^notes^prn".split(/\^/)
-      @med_fields_linked_data=Array.new(13)
-      @med_fields_linked_data[0]=true
-      @med_summary_fields="drug^status".split(/\^/)
-      @med_summary_fields_linked_data=[true,nil]
       @order_status = {
         0  => 'Error',
         1  => 'Discontinued',
@@ -47,11 +42,13 @@ module Vista
         98 => 'New',
         99 => 'No status'
       }
-      @fields="type^ordered_item^infusion_rate^start_date^stop_date^refills^tot_dose^unit_per_dose^status^lastfill^directions^notes^prn^category^clinical_category^provider^signed^flagged".split('^')
-      @fields_linked_data=Array.new(18)
+      @fields="type^ordered_item^start_date^stop_date^refills^quantity^unit_per_dose^status^lastfill^directions^prn^category^clinical_category^provider^signed^flagged".split('^')
+      @fields_linked_data=Array.new(17)
       @fields_linked_data[0]=true
       @fields_linked_data[1]=true
-      @fields_linked_data[15]=true
+      @fields_linked_data[14]=true
+      @med_summary_fields="drug^status".split(/\^/)
+      @med_summary_fields_linked_data=[true,nil]
     end
     
     # =============================================================================
@@ -175,7 +172,7 @@ module Vista
             order=nil
           end
           line.chomp!
-          list = line.pieces("^", 1, 2, 0,0, 4, 5,0,0,6,0,0,0,0,0,11,10,7,13)
+          list = line.pieces("^", 1,2,0,0,4,5,0,0,6,0,0,0,0,11,10,7,13)
           status=list[8].to_i
           list[13]=types_hash[list[1]]
           type=@order_type_mapping[list[1]]
@@ -188,23 +185,23 @@ module Vista
           list[8] = @order_status[status]
           list[3].fmdate!
           list[4].fmdate!
-          if(!list[15].empty?) 
-            list[14] = list[14].piece("~")
-            list[15] << "|" << list[14]
+          if(!list[14].empty?) 
+            list[13] = list[13].piece("~")
+            list[14] << "|" << list[13]
           end
-          list[14]=type=="meds" ? list[13] : ""
+          list[13]=type=="meds" ? list[12] : ""
+          if list[15]=="1"
+            list[15]="true"
+          else
+            list[15]="false"
+          end
           if list[16]=="1"
             list[16]="true"
           else
             list[16]="false"
           end
-          if list[17]=="1"
-            list[17]="true"
-          else
-            list[17]="false"
-          end
-          category=category_hash[list[13]]
-          list[13]=category if category
+          category=category_hash[list[12]]
+          list[12]=category if category
           sig=""
           order=nil
         when "t"
@@ -226,6 +223,10 @@ module Vista
       finish_line_data(conn,state)
     end
 
+    # =============================================================================
+    # Get the detail for an order
+    # @param id the order id
+    # =============================================================================
     def order(session,conn,broker,dfn,paths)
       ien,format=extract_format_and_key(conn,paths)
       ien.replace_char!('_',';')
@@ -234,8 +235,70 @@ module Vista
   
     end
   
-
+    # =============================================================================
+    # Flags an order
+    # 
+    # @param id the order id
+    # =============================================================================
+    def flag(session,conn,broker,dfn,paths)
+      ien,format=extract_format_and_key(conn,paths)
+      ien.replace_char!('_',';')
   
+    end
+  
+    # =============================================================================
+    # Un-Flags an order
+    # 
+    # @param id the order id
+    # =============================================================================
+    def unflag(session,conn,broker,dfn,paths)
+      ien,format=extract_format_and_key(conn,paths)
+      ien.replace_char!('_',';')
+  
+    end
+
+    # =============================================================================
+    # Places an order on hold
+    # 
+    # @param id the order id
+    # =============================================================================
+    def hold(session,conn,broker,dfn,paths)
+      ien,format=extract_format_and_key(conn,paths)
+      ien.replace_char!('_',';')
+  
+    end
+  
+    # =============================================================================
+    # Un-holds (resumes) an order
+    # 
+    # @param id the order id
+    # =============================================================================
+    def unhold(session,conn,broker,dfn,paths)
+      ien,format=extract_format_and_key(conn,paths)
+      ien.replace_char!('_',';')
+  
+    end
+  
+    # =============================================================================
+    # Signs an order
+    # 
+    # @param id the order id
+    # @param signature the signing code
+    # =============================================================================
+    def sign(session,conn,broker,dfn,paths)
+      ien,format=extract_format_and_key(conn,paths)
+      ien.replace_char!('_',';')
+  
+    end
+  
+    # =============================================================================
+    # Discontinues an order
+    # @param id the order id
+    # =============================================================================
+    def discontinue(session,conn,broker,dfn,paths)
+      ien,format=extract_format_and_key(conn,paths)
+      ien.replace_char!('_',';')
+    end
     # =============================================================================
     # Get the list of ordered medications
     # @param type optional medication type (active, summary)
@@ -244,9 +307,8 @@ module Vista
       type=paths.shift
       type='list' unless type
       case type
-      when 'active'
-      when 'list'
-        active_medications(session,conn,broker,dfn,paths)
+      when 'active','list'
+        list(session,conn,broker,dfn,paths)
       when 'summary'
         medication_summary(session,conn,broker,dfn,paths)
       else
@@ -314,106 +376,6 @@ module Vista
       finish_line_data(conn,state)
     end
 
-    # =============================================================================
-    # Get the active medications for the current patient
-    #
-    # broker call returns:
-    #  type^ien^drug^infusion_rate^stop_date^refills^tot_dose^unit_dose^orderid^status^lastfill^^^start_date
-    #   drug\directions on seperate lines
-    #
-    # rave returns:
-    # id|type^drug^infusion_rate^start_date^stop_date^refills^tot_dose^unit_dose^orderid^status^lastfill^directions^notes
-    # =============================================================================
-    def active_medications(session,conn,broker,dfn,paths)
-      format=extract_format(conn,paths)
-      rpc = broker.rpc("ORWPS ACTIVE", dfn)
-      rpc.strip!
-      return no_data(conn,format) if rpc==""
-      state=start_line_data(conn,format,@med_fields,@med_fields_linked_data)
-      state.escape=true
-      orders=rpc.split("~")
-      orders.shift
-      su=StringUtils.new
-      until orders.empty?
-        lines=orders.shift.split(/\n/)
-        s=lines.shift
-        s.strip!
-        list=s.split('^')
-        s=list.shift
-        s.chomp!
-        case s
-        when 'UD'
-          type="Unit Dose"
-        when 'OP'
-          #type="Outpatient"
-          next #don't want outpatient
-        when "IV"
-          type="Intravenous"
-        else
-          type="Home"
-        end
-        #move start date
-        s=""
-        s=list[14].fmdate! if list[14]
-        list.insert(3,s)
-
-        list[4].fmdate!
-        list.slice!(13..-1)
-        list[11]=""
-        list[12]=""
-        rpc=""
-        list[9]=su.title_case(list[9])
-        case list[9]
-        when 'Expired','Discontinued','Canceled'
-          next
-        end
-        until lines.empty?
-          s=lines.shift
-          s.strip!
-          next if s=="t  HOME"
-          case s[0]
-          when 116# 't'
-            list[13] << "\\n" if list[13]!=""
-            list[12] << s[1..-1]
-          when 92 # '\\
-            list[12] << "\\n" if list[12]!=""
-            list[11] << s[1..-1]
-          else
-            list[11] << " "
-            list[11] << s
-          end
-        end
-        list[11].strip!
-        list[12].strip!
-        if list[11].starts_with?(list[1])
-          n=list[11].index(']')
-          if n
-            list[1]=list[11][0..n]
-            list[11]=list[11][n+1..-1]
-            list[11].strip!
-          else
-            list[11]=list[11][list[1].length..-1]
-          end
-        elsif list[11].starts_with?("[GEQ")
-          n=list[11].index(']')
-          if n
-            list[11]=list[11][n+1..-1]
-            list[11].strip!
-          end
-        end
-        list[12]=list[12][1..-1] if list[12][0]==92
-        list[0].replace_char!(';','_')
-        list[0]="#{list[0]}|#{type}"
-        list[1]=su.title_case(list[1])
-        list[11]=su.title_case(list[11])
-        if list[9]=="Pending"
-          list[1]=format_color_hint(format,list[1],"pending")
-        end
-        send_line_data(conn,format,list,state)
-      end
-      finish_line_data(conn,state)
-    end
-    
     def events(session,conn,broker,dfn,paths)
       conn.put rpc = broker.rpc("OREVNTX LIST",dfn)
     end

@@ -133,7 +133,7 @@ client_site_parameters: {
   xmpp_service: "",
   xmpp_muc_service: "",
   keepalive_interval: 120,
-  attributesURL: "vista/ui/attributes.json"
+  attributesURL: "/hub/vista/ui/attributes.json"
 }
 
 #Application strings the get_String methods on intModuleBase class will look for strings here
